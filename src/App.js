@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
-import axios from 'axios';
 import Filter from './components/Filter'
+import personServices from './services/persons';
 import Form from './components/Form'
 import PersonsCom from './components/Persons'
 
@@ -12,8 +12,9 @@ const App = () => {
 
   useEffect(() => {
     async function fetchData() {
-      const response = await axios.get('http://localhost:3001/persons');
-      setPersons(response.data)
+      const data = await personServices.getAll();
+      console.log(data)
+      setPersons(data)
     }
     fetchData();
   }, [])
@@ -36,9 +37,9 @@ const App = () => {
     setFilterValue(event.target.value)
   }
 
-  const addName = (event) => {
+  const addPerson = async (event) => {
     event.preventDefault();
-    const name = {
+    const personObject = {
       name: NewName,
       number: number
     }
@@ -52,7 +53,8 @@ const App = () => {
       setNumber('');
       setNewName('');
     } else {
-      setPersons(Persons.concat(name));
+      const response = await personServices.create(personObject)
+      setPersons(Persons.concat(response.data));
       setNewName('')
       setNumber('')
     }
@@ -76,7 +78,7 @@ const App = () => {
           handleNumberChange={handleNumberChange}
           Number={number}
           Name={NewName}
-          handleSubmit={addName}
+          handleSubmit={addPerson}
         />
       </div>
 
